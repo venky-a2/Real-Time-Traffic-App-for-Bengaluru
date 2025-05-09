@@ -1,0 +1,30 @@
+name: Train & Deploy AI Model
+
+on:
+  schedule:
+    - cron: '0 3 * * 1' # Runs every Monday at 3 AM
+  push:
+    branches:
+      - main
+
+jobs:
+  train-model:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Install Dependencies
+        run: npm install @tensorflow/tfjs
+      
+      - name: Train AI Model
+        run: node scripts/trainModel.js
+      
+      - name: Upload Updated Model
+        uses: actions/upload-artifact@v3
+        with:
+          name: trained-model
+          path: models/
+
+      - name: Deploy Model to Firebase Storage
+        run: firebase deploy --only storage
